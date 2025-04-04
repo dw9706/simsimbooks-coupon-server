@@ -39,6 +39,9 @@ public class BookService {
 
     @Transactional
     public BookResponseDto updateBook(Long bookId, BookRequestDto requestDto) {
+        if (Objects.isNull(bookId)) {
+            throw new IllegalArgumentException("bookId is null");
+        }
         Optional<Book> optionalBook = bookRepository.findById(bookId);
 
         if (optionalBook.isEmpty()) {
