@@ -7,14 +7,21 @@ import lombok.*;
 @Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
 @Getter
 @Setter
 public class User {
+
+    @Builder
+    public User(String name, String email, Gender gender) {
+        this.name = name;
+        this.email = email;
+        this.gender = gender;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
     @Setter(AccessLevel.NONE)
+    @Column(name = "user_id")
     private Long id;
 
     @Column(name = "user_name", length = 50)

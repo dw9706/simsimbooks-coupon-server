@@ -51,9 +51,9 @@ public class UserService {
         }
 
         User user = optionalUser.get();
-        user.setName(requestDto.getName());
-        user.setEmail(requestDto.getEmail());
-        user.setGender(requestDto.getGender());
+        Optional.ofNullable(requestDto.getName()).ifPresent(user::setName);
+        Optional.ofNullable(requestDto.getEmail()).ifPresent(user::setEmail);
+        Optional.ofNullable(requestDto.getGender()).ifPresent(user::setGender);
 
         return UserMapper.toResponse(user);
     }

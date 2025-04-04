@@ -52,7 +52,11 @@ CREATE TABLE IF NOT EXISTS coupons (
 CREATE TABLE IF NOT EXISTS books (
      book_id BIGINT AUTO_INCREMENT PRIMARY KEY,
      title TEXT NOT NULL,                                 -- 제목
-     sale_price DECIMAL(10,2) NOT NULL                    -- 판매가
+     sale_price DECIMAL(10,2) NOT NULL,-- 판매가
+     category_id BIGINT NOT NULL,
+     CONSTRAINT books_categories__fk
+     FOREIGN KEY(category_id)
+     REFERENCES categories(category_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 6. 카테고리 (categories)
@@ -65,18 +69,6 @@ CREATE TABLE IF NOT EXISTS categories (
     REFERENCES categories(category_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 7. 도서카테고리 (book_categories)
-CREATE TABLE IF NOT EXISTS book_categories (
-   book_category_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-   book_id BIGINT NOT NULL,                             -- books 테이블과 연결
-   category_id BIGINT NOT NULL,                         -- categories 테이블과 연결
-   CONSTRAINT fk_book_categories_book
-   FOREIGN KEY (book_id)
-    REFERENCES books(book_id),
-    CONSTRAINT fk_book_categories_category
-    FOREIGN KEY (category_id)
-    REFERENCES categories(category_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 8. 책쿠폰 (book_coupons)
 CREATE TABLE IF NOT EXISTS book_coupons (
