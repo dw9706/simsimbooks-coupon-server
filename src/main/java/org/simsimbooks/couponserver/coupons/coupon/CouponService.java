@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.simsimbooks.couponserver.book.BookRepository;
 import org.simsimbooks.couponserver.book.dto.BookResponseDto;
 import org.simsimbooks.couponserver.book.entity.Book;
+import org.simsimbooks.couponserver.category.dto.CategoryResponseDto;
 import org.simsimbooks.couponserver.category.entity.Category;
 import org.simsimbooks.couponserver.coupons.bookcoupon.entity.BookCoupon;
 import org.simsimbooks.couponserver.coupons.categorycoupon.entity.CategoryCoupon;
@@ -149,11 +150,12 @@ public class CouponService {
         List<Coupon> coupons = couponRepository.findEligibleCouponToBook(userId, book.getId(),orderAmount); //유저의 모든 전체쿠폰, 모든 카테고리 쿠폰, 책에 적용가능한 책 쿠폰을 가져온다.
 
         //책의 정보를 가지고 와서 책이 속한 카테고리 Id를 모두 가지고 온다.
-        BookResponseDto bookDetail = bookGetService.getBookDetail(null, book.getId());
-        List<Long> categoryIdList = bookDetail.getCategoryList().stream()
-                .flatMap(List::stream)
-                .map(CategoryResponseDto::getCategoryId) // 각 CategoryResponseDto에서 ID 추출
-                .toList();
+//        BookResponseDto bookDetail = bookGetService.getBookDetail(null, book.getId());
+//        List<Long> categoryIdList = bookDetail.getCategoryList().stream()
+//                .flatMap(List::stream)
+//                .map(CategoryResponseDto::getId) // 각 CategoryResponseDto에서 ID 추출
+//                .toList();
+        List<Long> categoryIdList = new ArrayList<>();
 
         List<Coupon> eligibleCoupons = new ArrayList<>();
 
@@ -308,9 +310,9 @@ public class CouponService {
         Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new NoSuchElementException("쿠폰(id:" + couponId + ")이 존재하지 않습니다."));
 //        BookResponseDto bookDetail = bookRepository.getBookDetail(null, book.getBookId());
 //        List<List<CategoryResponseDto>> categoryList = bookDetail.getCategoryList();
-        List<BookCategory> bookCategoryList = bookCategoryRepository.findByBookId(book.getId());
+//        List<BookCategory> bookCategoryList = bookCategoryRepository.findByBookId(book.getId());
 
-
+        List<Category> bookCategoryList = new ArrayList<>();
 
         // 쿠폰 적용 가능한지 확인
         if (coupon.getCouponType() instanceof BookCoupon bookCoupon) {
@@ -327,8 +329,8 @@ public class CouponService {
 //                }
 //            }
             Long couponCategoryId = categoryCoupon.getCategory().getId();
-            for (BookCategory bookCategory : bookCategoryList) {
-                Category catagory = bookCategory.getCatagory();
+            for (Category bookCategory : bookCategoryList) {
+                Category catagory = bookCategory;
                 // 책의 가장 하위 카테고리와 카테고리 쿠폰의 id가 같은지 확인
                 if (couponCategoryId.equals(catagory.getId())) {
                     flag = false;

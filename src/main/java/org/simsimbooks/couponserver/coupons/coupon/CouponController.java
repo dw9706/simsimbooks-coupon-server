@@ -205,7 +205,7 @@ public class CouponController {
 
 
     private Pageable setPageable(Pageable pageable, String sortField) {
-        String sortBy = (StringUtils.isEmpty(sortField) && StringUtils.isBlank(sortField) ? "issueDate" : sortField);
+        String sortBy = (StringUtils.isEmpty(sortField) && StringUtils.hasText(sortField) ? "issueDate" : sortField);
         return PageRequest.of(
                 pageable.getPageNumber(),
                 10, //페이지 사이즈를 10으로 고정
