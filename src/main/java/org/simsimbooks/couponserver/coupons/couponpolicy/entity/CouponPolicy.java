@@ -25,7 +25,7 @@ public class CouponPolicy {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "discount_type", nullable = false)
-    private DisCountType discountType;
+    private DiscountType discountType;
 
     @Column(name = "discount_price", precision = 10, scale = 2)
     private BigDecimal discountPrice; //FIX

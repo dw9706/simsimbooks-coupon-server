@@ -1,21 +1,19 @@
-package org.simsimbooks.couponserver.coupons.coupon;
+package org.simsimbooks.couponserver.coupons.usercoupon;
 
 import lombok.RequiredArgsConstructor;
 import org.simsimbooks.couponserver.book.BookRepository;
-import org.simsimbooks.couponserver.book.dto.BookResponseDto;
 import org.simsimbooks.couponserver.book.entity.Book;
-import org.simsimbooks.couponserver.category.dto.CategoryResponseDto;
 import org.simsimbooks.couponserver.category.entity.Category;
 import org.simsimbooks.couponserver.coupons.bookcoupon.entity.BookCoupon;
 import org.simsimbooks.couponserver.coupons.categorycoupon.entity.CategoryCoupon;
-import org.simsimbooks.couponserver.coupons.coupon.dto.CouponResponseDto;
-import org.simsimbooks.couponserver.coupons.coupon.dto.DiscountAmountResponseDto;
-import org.simsimbooks.couponserver.coupons.coupon.dto.EmptyCouponResponseDto;
-import org.simsimbooks.couponserver.coupons.coupon.entity.Coupon;
-import org.simsimbooks.couponserver.coupons.coupon.entity.CouponStatus;
-import org.simsimbooks.couponserver.coupons.coupon.mapper.CouponMapper;
+import org.simsimbooks.couponserver.coupons.couponpolicy.entity.DiscountType;
+import org.simsimbooks.couponserver.coupons.usercoupon.dto.UserCouponResponseDto;
+import org.simsimbooks.couponserver.coupons.usercoupon.dto.DiscountAmountResponseDto;
+import org.simsimbooks.couponserver.coupons.usercoupon.dto.EmptyUserCouponResponseDto;
+import org.simsimbooks.couponserver.coupons.usercoupon.entity.UserCoupon;
+import org.simsimbooks.couponserver.coupons.usercoupon.entity.UserCouponStatus;
+import org.simsimbooks.couponserver.coupons.usercoupon.mapper.UserCouponMapper;
 import org.simsimbooks.couponserver.coupons.couponpolicy.entity.CouponPolicy;
-import org.simsimbooks.couponserver.coupons.couponpolicy.entity.DisCountType;
 import org.simsimbooks.couponserver.coupons.coupontype.CouponTypeRepository;
 import org.simsimbooks.couponserver.coupons.coupontype.entity.CouponType;
 import org.simsimbooks.couponserver.user.UserRepository;
@@ -33,30 +31,30 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class CouponService {
-    private final CouponRepository couponRepository;
+public class UserCouponService {
+    private final UserCouponRepository couponRepository;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final CouponTypeRepository couponTypeRepository;
 
-    public Page<CouponResponseDto> getTotalCoupons(Pageable pageable) {
-        Page<Coupon> totalCoupons = couponRepository.findAll(pageable);
-        return totalCoupons.map(CouponMapper::toResponse);
+    public Page<UserCouponResponseDto> getTotalCoupons(Pageable pageable) {
+        Page<UserCoupon> totalCoupons = couponRepository.findAll(pageable);
+        return totalCoupons.map(UserCouponMapper::toResponse);
     }
     /**
      * couponId로 쿠폰을 가져온다.
-     * @param couponId
+     * @param userCouponId
      * @throws IllegalArgumentException id가 0이거나 null일 경우
      * @return 쿠폰
      */
-    public CouponResponseDto getCouponById(Long couponId) {
+    public UserCouponResponseDto getUserCouponById(Long userCouponId) {
         //couponId null 체크
-        validateId(couponId);
+        validateId(userCouponId);
 
-        Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new NoSuchElementException("쿠폰(id:"+couponId+")이 존재하지 않습니다."));
+        UserCoupon userCoupon = couponRepository.findById(userCouponId).orElseThrow(() -> new NoSuchElementException("쿠폰(id:"+userCouponId+")이 존재하지 않습니다."));
 
 
-        return CouponMapper.toResponse(coupon);
+        return UserCouponMapper.toResponse(userCoupon);
 
     }
 
@@ -69,16 +67,16 @@ public class CouponService {
      * @throws NoSuchElementException 쿠폰, 회원이 존재하지 않을 경우
      * @return 미사용된 쿠폰
      */
-    public CouponResponseDto getUnusedCouponByCouponType(Long userId, Long couponTypeId) {
+    public UserCouponResponseDto getUnusedUserCouponByCouponType(Long userId, Long couponTypeId) {
         validateId(userId);
         validateId(couponTypeId);
         userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("회원(id:" + userId + ")이 존재하지 않습니다."));
         couponTypeRepository.findById(couponTypeId).orElseThrow(() -> new NoSuchElementException("쿠폰 정책(id:" + couponTypeId + ")이 존재하지 않습니다."));
-        Optional<Coupon> unusedCoupon = couponRepository.findUnusedCouponByUserAndType(userId, couponTypeId);
-        if (unusedCoupon.isPresent()) {
-            return CouponMapper.toResponse(unusedCoupon.get());
+        Optional<UserCoupon> unusedUserCoupon = couponRepository.findUnusedCouponByUserAndType(userId, couponTypeId);
+        if (unusedUserCoupon.isPresent()) {
+            return UserCouponMapper.toResponse(unusedUserCoupon.get());
         }
-        return EmptyCouponResponseDto.builder().build();
+        return EmptyUserCouponResponseDto.builder().build();
 
     }
 
@@ -91,15 +89,15 @@ public class CouponService {
      * @throws NoSuchElementException 회원이 존재하지 않을 경우
      * @return 유저의 쿠폰 페이지
      */
-    public Page<CouponResponseDto> getCoupons(Pageable pageable, Long userId) {
+    public Page<UserCouponResponseDto> getUserCoupons(Pageable pageable, Long userId) {
         //userId null 체크
         validateId(userId);
         //유저 확인
         userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("회원(id:"+userId+")이 존재하지 않습니다."));
 
-        Page<Coupon> couponPage = couponRepository.findByUserId(pageable, userId);
+        Page<UserCoupon> userCouponPage = couponRepository.findByUserId(pageable, userId);
 
-        return couponPage.map(CouponMapper::toResponse);
+        return userCouponPage.map(UserCouponMapper::toResponse);
     }
 
     /**
@@ -111,22 +109,22 @@ public class CouponService {
 
      * @return 미사용된 쿠폰 페이지
      */
-    public Page<CouponResponseDto> getUnusedCoupons(Pageable pageable, Long userId) {
+    public Page<UserCouponResponseDto> getUnusedUserCoupons(Pageable pageable, Long userId) {
         //userId null 체크
         validateId(userId);
         //유저 확인
         userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("회원(id:"+userId+")이 존재하지 않습니다."));
-        Page<Coupon> couponPage = couponRepository.findByUserUserIdAndCouponStatusAndDeadlineAfterNow(userId, CouponStatus.UNUSED, pageable);
-        return couponPage.map(CouponMapper::toResponse);
+        Page<UserCoupon> userCouponPage = couponRepository.findByUserUserIdAndCouponStatusAndDeadlineAfterNow(userId, UserCouponStatus.UNUSED, pageable);
+        return userCouponPage.map(UserCouponMapper::toResponse);
     }
-    public List<CouponResponseDto> getExpiredCoupons() {
-        List<Coupon> coupons = couponRepository.findByCouponStatus(CouponStatus.EXPIRED);
-        return coupons.stream().map(CouponMapper::toResponse).toList();
+    public List<UserCouponResponseDto> getExpiredUserCoupons() {
+        List<UserCoupon> userCoupons = couponRepository.findByUserCouponStatus(UserCouponStatus.EXPIRED);
+        return userCoupons.stream().map(UserCouponMapper::toResponse).toList();
     }
 
-    public List<CouponResponseDto> getUnusedButDeadlinePassedCoupon() {
-        List<Coupon> coupons = couponRepository.findUnusedAndExpiredCoupons();
-        return coupons.stream().map(CouponMapper::toResponse).toList();
+    public List<UserCouponResponseDto> getUnusedButDeadlinePassedUserCoupon() {
+        List<UserCoupon> userCoupons = couponRepository.findUnusedAndExpiredCoupons();
+        return userCoupons.stream().map(UserCouponMapper::toResponse).toList();
     }
 
     /**
@@ -138,7 +136,7 @@ public class CouponService {
      * @return 적용가능한 쿠폰 패이지
      */
     @Transactional
-    public List<CouponResponseDto> getEligibleCoupons(Long userId, Long bookId, int quantity) {
+    public List<UserCouponResponseDto> getEligibleUserCoupons(Long userId, Long bookId, int quantity) {
         //userId null 체크
         validateId(userId);
         //bookId null 체크
@@ -147,7 +145,7 @@ public class CouponService {
         userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("회원(id:" + userId + ")이 존재하지 않습니다."));
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new NoSuchElementException("도서(id:" + bookId + ")이 존재하지 않습니다."));
         BigDecimal orderAmount = book.getSalePrice().multiply(BigDecimal.valueOf(quantity));
-        List<Coupon> coupons = couponRepository.findEligibleCouponToBook(userId, book.getId(),orderAmount); //유저의 모든 전체쿠폰, 모든 카테고리 쿠폰, 책에 적용가능한 책 쿠폰을 가져온다.
+        List<UserCoupon> userCoupons = couponRepository.findEligibleCouponToBook(userId, book.getId(),orderAmount); //유저의 모든 전체쿠폰, 모든 카테고리 쿠폰, 책에 적용가능한 책 쿠폰을 가져온다.
 
         //책의 정보를 가지고 와서 책이 속한 카테고리 Id를 모두 가지고 온다.
 //        BookResponseDto bookDetail = bookGetService.getBookDetail(null, book.getId());
@@ -157,32 +155,32 @@ public class CouponService {
 //                .toList();
         List<Long> categoryIdList = new ArrayList<>();
 
-        List<Coupon> eligibleCoupons = new ArrayList<>();
+        List<UserCoupon> eligibleUserCoupons = new ArrayList<>();
 
         // 유저의 카테고리 쿠폰이 책에 적용 가능한지 확인한다.
-        for (Coupon coupon : coupons) {
+        for (UserCoupon userCoupon : userCoupons) {
             //유효기간이 지났는지 확인하고 지났으면 만료처리
-            if (coupon.getDeadline().isBefore(LocalDateTime.now())) {
-                coupon.expire();
+            if (userCoupon.getDeadline().isBefore(LocalDateTime.now())) {
+                userCoupon.expire();
                 continue;
             }
-            if (coupon.getCouponType() instanceof CategoryCoupon categoryCoupon) {
+            if (userCoupon.getCouponType() instanceof CategoryCoupon categoryCoupon) {
                 Long targetId = categoryCoupon.getCategory().getId();
                 for (Long categoryId : categoryIdList) {
                     //카테고리 쿠폰의 targetId와 일치하면 List에 저장
                     if (targetId.equals(categoryId)) {
-                        eligibleCoupons.add(coupon);
+                        eligibleUserCoupons.add(userCoupon);
                         break;
                     }
                 }
                 // 카테고리 쿠폰이 아니라면 List에 저장
             } else {
-                eligibleCoupons.add(coupon);
+                eligibleUserCoupons.add(userCoupon);
             }
         }
 
 
-        return eligibleCoupons.stream().map(CouponMapper::toResponse).toList();
+        return eligibleUserCoupons.stream().map(UserCouponMapper::toResponse).toList();
     }
 
 
@@ -195,7 +193,7 @@ public class CouponService {
      * @return 발행된 쿠폰들
      */
     @Transactional
-    public void issueCoupons(List<Long> userIds, Long couponTypeId) {
+    public void issueUserCoupons(List<Long> userIds, Long couponTypeId) {
         List<Long> result = new ArrayList<>();
         validateId(couponTypeId);
         CouponType couponType = couponTypeRepository.findById(couponTypeId).orElseThrow(() -> new NoSuchElementException("쿠폰 정책(id:" + couponTypeId + ")이 존재하지 않습니다.1"));
@@ -205,44 +203,23 @@ public class CouponService {
             validateId(userId);
             User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("회원(id:" + userId + ")이 존재하지 않습니다."));
 
-            Optional<Coupon> unusedCoupon = couponRepository.findUnusedCouponByUserAndType(userId, couponTypeId);
+            Optional<UserCoupon> unusedUserCoupon = couponRepository.findUnusedCouponByUserAndType(userId, couponTypeId);
 
             //회원이 해당 쿠폰타입의 UNUSED쿠폰을 가지고 있는지 확인 후 있으면 삭제 후 새로 발급
-            unusedCoupon.ifPresent(couponRepository::delete);
+            unusedUserCoupon.ifPresent(couponRepository::delete);
 
-            Coupon coupon = Coupon.builder()
+            UserCoupon userCoupon = UserCoupon.builder()
                     .issueDate(LocalDateTime.now())
-                    .deadline(calCouponDeadline(couponType))
-                    .couponStatus(CouponStatus.UNUSED)
+                    .deadline(calUserCouponDeadline(couponType))
+                    .userCouponStatus(UserCouponStatus.UNUSED)
                     .couponType(couponType)
                     .user(user)
                     .build();
 
-            Coupon savedCoupon = couponRepository.save(coupon);
-            result.add(savedCoupon.getCouponId());
+            UserCoupon savedUserCoupon = couponRepository.save(userCoupon);
+            result.add(savedUserCoupon.getId());
 
         }
-    }
-
-    /**
-     * 쿠폰을 만료시킨다.
-     * @param userId
-     * @param couponId
-     * @throws IllegalArgumentException id가 0이거나 null일 경우
-     * @throws NoSuchElementException 회원,쿠폰이 존재하지 않을 경우
-     * @return 만료된 쿠폰
-     */
-    @Transactional
-    public CouponResponseDto expireCoupon(Long userId, Long couponId) {
-        validateId(userId);
-        validateId(couponId);
-
-        userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("회원(id:" + userId + ")이 존재하지 않습니다."));
-        Coupon coupon = couponRepository.findByUserIdAndCouponId(userId, couponId).orElseThrow(() -> new NoSuchElementException("회원(id:" + userId + ")은 쿠폰(id:" + couponId + ")을 가지고 있지 않습니다."));
-
-        coupon.expire();
-
-        return CouponMapper.toResponse(coupon);
     }
 
     /**
@@ -254,13 +231,13 @@ public class CouponService {
      * @return 사용한 쿠폰
      */
     @Transactional
-    public CouponResponseDto useCoupon(Long userId, Long couponId) {
+    public UserCouponResponseDto useUserCoupon(Long userId, Long couponId) {
         validateId(userId);
         validateId(couponId);
 
         userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("회원(id:" + userId + ")이 존재하지 않습니다."));
-        Coupon coupon = couponRepository.findByUserIdAndCouponId(userId, couponId).orElseThrow(() -> new NoSuchElementException("회원(id:" + userId + ")은 쿠폰(id:" + couponId + ")을 가지고 있지 않습니다."));
-        if (coupon.getCouponStatus() != CouponStatus.UNUSED) {
+        UserCoupon coupon = couponRepository.findByUserIdAndUserCouponId(userId, couponId).orElseThrow(() -> new NoSuchElementException("회원(id:" + userId + ")은 쿠폰(id:" + couponId + ")을 가지고 있지 않습니다."));
+        if (coupon.getUserCouponStatus() != UserCouponStatus.UNUSED) {
             throw new IllegalStateException("회원(id:" + userId + ")의 쿠폰(id:" + couponId + ")은 이미 사용된 쿠폰입니다.");
         }
         if (coupon.getDeadline().isBefore(LocalDateTime.now())) {
@@ -269,45 +246,66 @@ public class CouponService {
         }
         coupon.use();
 
-        return CouponMapper.toResponse(coupon);
+        return UserCouponMapper.toResponse(coupon);
+    }
+
+    /**
+     * 쿠폰을 만료시킨다.
+     * @param userId
+     * @param userCouponId
+     * @throws IllegalArgumentException id가 0이거나 null일 경우
+     * @throws NoSuchElementException 회원,쿠폰이 존재하지 않을 경우
+     * @return 만료된 쿠폰
+     */
+    @Transactional
+    public UserCouponResponseDto expireUserCoupon(Long userId, Long userCouponId) {
+        validateId(userId);
+        validateId(userCouponId);
+
+        userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("회원(id:" + userId + ")이 존재하지 않습니다."));
+        UserCoupon userCoupon = couponRepository.findByUserIdAndUserCouponId(userId, userCouponId).orElseThrow(() -> new NoSuchElementException("회원(id:" + userId + ")은 쿠폰(id:" + userCouponId + ")을 가지고 있지 않습니다."));
+
+        userCoupon.expire();
+
+        return UserCouponMapper.toResponse(userCoupon);
     }
 
     /**
      * 쿠폰을 삭제합니다. (쿠폰 사용과 다름)
      * @param userId
-     * @param couponId
+     * @param userCouponId
      * @throws IllegalArgumentException id가 0이거나 null일 경우
      * @throws NoSuchElementException 회원,쿠폰이 존재하지 않을 경우
      */
     @Transactional
-    public void deleteCoupon(Long userId, Long couponId) {
+    public void deleteUserCoupon(Long userId, Long userCouponId) {
         validateId(userId);
-        validateId(couponId);
+        validateId(userCouponId);
 
         userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("회원(id:" + userId + ")이 존재하지 않습니다."));
-        Coupon coupon = couponRepository.findByUserIdAndCouponId(userId, couponId).orElseThrow(() -> new NoSuchElementException("회원(id:" + userId + ")은 쿠폰(id:" + couponId + ")을 가지고 있지 않습니다."));
+        UserCoupon userCoupon = couponRepository.findByUserIdAndUserCouponId(userId, userCouponId).orElseThrow(() -> new NoSuchElementException("회원(id:" + userId + ")은 쿠폰(id:" + userCouponId + ")을 가지고 있지 않습니다."));
 
-        couponRepository.delete(coupon);
+        couponRepository.delete(userCoupon);
     }
 
     /**
      * 주문 금액에 대해 적용된 쿠폰 할인 금액을 반환한다.
      * @param bookId
      * @param quantity
-     * @param couponId
+     * @param userCouponId
      * @throws IllegalArgumentException id,quantity가 0이거나 null일 경우
      * @throws NoSuchElementException 책,쿠폰이 존재하지 않을 경우
      * @return 할인금액, 할인 전 금액, 할인 후 금액
      */
     @Transactional
-    public DiscountAmountResponseDto calDiscountAmount(Long bookId, Integer quantity, Long couponId) {
+    public DiscountAmountResponseDto calDiscountAmount(Long bookId, Integer quantity, Long userCouponId) {
         if (quantity < 1) {
             throw new IllegalArgumentException("책의 수량은 0보다 많아야합니다.");
         }
         validateId(bookId);
-        validateId(couponId);
+        validateId(userCouponId);
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new NoSuchElementException("책(id:" + bookId + ")이 존재하지 않습니다."));
-        Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new NoSuchElementException("쿠폰(id:" + couponId + ")이 존재하지 않습니다."));
+        UserCoupon userCoupon = couponRepository.findById(userCouponId).orElseThrow(() -> new NoSuchElementException("쿠폰(id:" + userCouponId + ")이 존재하지 않습니다."));
 //        BookResponseDto bookDetail = bookRepository.getBookDetail(null, book.getBookId());
 //        List<List<CategoryResponseDto>> categoryList = bookDetail.getCategoryList();
 //        List<BookCategory> bookCategoryList = bookCategoryRepository.findByBookId(book.getId());
@@ -315,11 +313,11 @@ public class CouponService {
         List<Category> bookCategoryList = new ArrayList<>();
 
         // 쿠폰 적용 가능한지 확인
-        if (coupon.getCouponType() instanceof BookCoupon bookCoupon) {
+        if (userCoupon.getCouponType() instanceof BookCoupon bookCoupon) {
             if (!bookCoupon.getBook().getId().equals(bookId)) {
-                throw new IllegalArgumentException("책 쿠폰(id:" + couponId + ")은 책(id:" + bookId + ")에 적용 불가능합니다.");
+                throw new IllegalArgumentException("책 쿠폰(id:" + userCouponId + ")은 책(id:" + bookId + ")에 적용 불가능합니다.");
             }
-        } else if (coupon.getCouponType() instanceof CategoryCoupon categoryCoupon) {
+        } else if (userCoupon.getCouponType() instanceof CategoryCoupon categoryCoupon) {
             boolean flag = true;
 //            for (List<CategoryResponseDto> categoryResponseDtos : categoryList) {
 //                for (CategoryResponseDto categoryResponseDto : categoryResponseDtos) {
@@ -351,7 +349,7 @@ public class CouponService {
                 }
             }
             if (flag) {
-                throw new IllegalArgumentException("카테고리 쿠폰(id:" + couponId + ")은 책(id:" + bookId + ")에 적용 불가능합니다.");
+                throw new IllegalArgumentException("카테고리 쿠폰(id:" + userCouponId + ")은 책(id:" + bookId + ")에 적용 불가능합니다.");
             }
         }
 
@@ -359,14 +357,14 @@ public class CouponService {
         BigDecimal bookOrderPrice = book.getSalePrice().multiply(new BigDecimal(quantity));
 
         // 쿠폰 정책
-        CouponPolicy couponPolicy = coupon.getCouponType().getCouponPolicy();
+        CouponPolicy couponPolicy = userCoupon.getCouponType().getCouponPolicy();
         // 최소 주문 금액에 못미치면
         if (couponPolicy.getMinOrderAmount().compareTo(bookOrderPrice) > 0) {
             throw new IllegalArgumentException("주문 금액(" + bookOrderPrice + ")이 쿠폰 최소 주문 금액(" + couponPolicy.getMinOrderAmount() + ")에 못미칩니다.");
         }
 
 
-        if (couponPolicy.getDiscountType() == DisCountType.FIX) {
+        if (couponPolicy.getDiscountType() == DiscountType.FIX) {
             return DiscountAmountResponseDto.builder()
                     .bookId(bookId)
                     .quantity(quantity)
@@ -415,7 +413,7 @@ public class CouponService {
      * @param couponType
      * @return
      */
-    private LocalDateTime calCouponDeadline(CouponType couponType) {
+    private LocalDateTime calUserCouponDeadline(CouponType couponType) {
         if (Objects.nonNull(couponType.getDeadline())) {
             return couponType.getDeadline();
         } else {

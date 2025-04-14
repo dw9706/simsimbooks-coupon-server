@@ -1,32 +1,32 @@
-package org.simsimbooks.couponserver.coupons.coupon.mapper;
+package org.simsimbooks.couponserver.coupons.usercoupon.mapper;
 
 
 import org.simsimbooks.couponserver.coupons.allcoupon.entity.AllCoupon;
 import org.simsimbooks.couponserver.coupons.bookcoupon.entity.BookCoupon;
 import org.simsimbooks.couponserver.coupons.categorycoupon.entity.CategoryCoupon;
-import org.simsimbooks.couponserver.coupons.coupon.dto.CouponResponseDto;
-import org.simsimbooks.couponserver.coupons.coupon.dto.FixCouponResponseDto;
-import org.simsimbooks.couponserver.coupons.coupon.dto.RateCouponResponseDto;
-import org.simsimbooks.couponserver.coupons.coupon.entity.Coupon;
+import org.simsimbooks.couponserver.coupons.usercoupon.dto.UserCouponResponseDto;
+import org.simsimbooks.couponserver.coupons.usercoupon.dto.FixUserCouponResponseDto;
+import org.simsimbooks.couponserver.coupons.usercoupon.dto.RateUserCouponResponseDto;
 import org.simsimbooks.couponserver.coupons.couponpolicy.entity.CouponPolicy;
 import org.simsimbooks.couponserver.coupons.coupontype.entity.CouponTargetType;
 import org.simsimbooks.couponserver.coupons.coupontype.entity.CouponType;
+import org.simsimbooks.couponserver.coupons.usercoupon.entity.UserCoupon;
 
 import java.util.Objects;
 
-public class CouponMapper {
-    public static CouponResponseDto toResponse(Coupon coupon) {
-        if (Objects.isNull(coupon)) {
-            throw new IllegalArgumentException("coupon is null");
+public class UserCouponMapper {
+    public static UserCouponResponseDto toResponse(UserCoupon userCoupon) {
+        if (Objects.isNull(userCoupon)) {
+            throw new IllegalArgumentException("userCoupon is null");
         }
 
-        CouponType couponType = coupon.getCouponType();
+        CouponType couponType = userCoupon.getCouponType();
         CouponPolicy couponPolicy = ((org.simsimbooks.couponserver.coupons.coupontype.entity.CouponType) couponType).getCouponPolicy();
         CouponDetails couponDetails = extractCouponDetails(couponType);
 
         return switch (couponPolicy.getDiscountType()) {
-            case FIX -> toFixCouponResponse(coupon, couponType, couponPolicy, couponDetails);
-            case RATE -> toRateCouponResponse(coupon, couponType, couponPolicy, couponDetails);
+            case FIX -> toFixCouponResponse(userCoupon, couponType, couponPolicy, couponDetails);
+            case RATE -> toRateCouponResponse(userCoupon, couponType, couponPolicy, couponDetails);
         };
     }
 
@@ -42,15 +42,15 @@ public class CouponMapper {
         }
     }
 
-    private static FixCouponResponseDto toFixCouponResponse(Coupon coupon, CouponType couponType, CouponPolicy couponPolicy, CouponDetails couponDetails) {
+    private static FixUserCouponResponseDto toFixCouponResponse(UserCoupon userCoupon, CouponType couponType, CouponPolicy couponPolicy, CouponDetails couponDetails) {
 
-        return FixCouponResponseDto.builder()
-                .userId(coupon.getUser().getId())
-                .couponId(coupon.getCouponId())
-                .issueDate(coupon.getIssueDate())
-                .deadline(coupon.getDeadline())
+        return FixUserCouponResponseDto.builder()
+                .userId(userCoupon.getUser().getId())
+                .id(userCoupon.getId())
+                .issueDate(userCoupon.getIssueDate())
+                .deadline(userCoupon.getDeadline())
                 .couponTypeName(couponType.getName())
-                .couponStatus(coupon.getCouponStatus())
+                .userCouponStatus(userCoupon.getUserCouponStatus())
                 .couponTargetType(couponDetails.couponTargetType())
                 .couponTargetId(couponDetails.targetId())
                 .discountPrice(couponPolicy.getDiscountPrice())
@@ -58,15 +58,15 @@ public class CouponMapper {
                 .build();
     }
 
-    private static RateCouponResponseDto toRateCouponResponse(Coupon coupon, CouponType couponType, CouponPolicy couponPolicy, CouponDetails couponDetails) {
+    private static RateUserCouponResponseDto toRateCouponResponse(UserCoupon userCoupon, CouponType couponType, CouponPolicy couponPolicy, CouponDetails couponDetails) {
 
-        return RateCouponResponseDto.builder()
-                .userId(coupon.getUser().getId())
-                .couponId(coupon.getCouponId())
-                .issueDate(coupon.getIssueDate())
-                .deadline(coupon.getDeadline())
+        return RateUserCouponResponseDto.builder()
+                .userId(userCoupon.getUser().getId())
+                .id(userCoupon.getId())
+                .issueDate(userCoupon.getIssueDate())
+                .deadline(userCoupon.getDeadline())
                 .couponTypeName(couponType.getName())
-                .couponStatus(coupon.getCouponStatus())
+                .userCouponStatus(userCoupon.getUserCouponStatus())
                 .couponTargetType(couponDetails.couponTargetType())
                 .couponTargetId(couponDetails.targetId())
                 .discountRate(couponPolicy.getDiscountRate())

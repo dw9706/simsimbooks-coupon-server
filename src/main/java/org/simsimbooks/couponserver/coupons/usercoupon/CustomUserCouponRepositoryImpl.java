@@ -1,4 +1,4 @@
-package org.simsimbooks.couponserver.coupons.coupon;
+package org.simsimbooks.couponserver.coupons.usercoupon;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -10,9 +10,9 @@ import org.simsimbooks.couponserver.coupons.bookcoupon.entity.BookCoupon;
 import org.simsimbooks.couponserver.coupons.bookcoupon.entity.QBookCoupon;
 import org.simsimbooks.couponserver.coupons.categorycoupon.entity.CategoryCoupon;
 import org.simsimbooks.couponserver.coupons.categorycoupon.entity.QCategoryCoupon;
-import org.simsimbooks.couponserver.coupons.coupon.entity.Coupon;
-import org.simsimbooks.couponserver.coupons.coupon.entity.CouponStatus;
-import org.simsimbooks.couponserver.coupons.coupon.entity.QCoupon;
+import org.simsimbooks.couponserver.coupons.usercoupon.entity.QUserCoupon;
+import org.simsimbooks.couponserver.coupons.usercoupon.entity.UserCoupon;
+import org.simsimbooks.couponserver.coupons.usercoupon.entity.UserCouponStatus;
 import org.simsimbooks.couponserver.coupons.couponpolicy.entity.QCouponPolicy;
 import org.simsimbooks.couponserver.coupons.coupontype.entity.QCouponType;
 
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public class CustomCouponRepositoryImpl implements CustomCouponRepository {
+public class CustomUserCouponRepositoryImpl implements CustomUserCouponRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     /**
@@ -31,8 +31,8 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
      * @return 특정 책에 적용 가능한 쿠폰 페이지
      */
     @Override
-    public List<Coupon> findEligibleCouponToBook(Long userId, Long bookId, BigDecimal orderAmount) {
-        QCoupon coupon = QCoupon.coupon;
+    public List<UserCoupon> findEligibleCouponToBook(Long userId, Long bookId, BigDecimal orderAmount) {
+        QUserCoupon userCoupon = QUserCoupon.userCoupon;
         QCouponType couponType = QCouponType.couponType;
         QCategoryCoupon categoryCoupon = QCategoryCoupon.categoryCoupon;
         QBookCoupon bookCoupon = QBookCoupon.bookCoupon;
@@ -40,15 +40,15 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
         QCategory bookCategory = QCategory.category;
         QCouponPolicy couponPolicy = QCouponPolicy.couponPolicy; // CouponPolicy Q타입
 
-        JPAQuery<Coupon> query = jpaQueryFactory.selectFrom(coupon)
-                .join(coupon.couponType, couponType)
+        JPAQuery<UserCoupon> query = jpaQueryFactory.selectFrom(userCoupon)
+                .join(userCoupon.couponType, couponType)
                 .leftJoin(categoryCoupon).on(couponType.id.eq(categoryCoupon.id))
                 .leftJoin(bookCoupon).on(couponType.id.eq(bookCoupon.id))
                 .leftJoin(allCoupon).on(couponType.id.eq(allCoupon.id))
                 .join(couponType.couponPolicy, couponPolicy) // CouponPolicy 조인 추가
                 .where(
-                        coupon.user.id.eq(userId)
-                                .and(coupon.couponStatus.eq(CouponStatus.UNUSED))
+                        userCoupon.user.id.eq(userId)
+                                .and(userCoupon.userCouponStatus.eq(UserCouponStatus.UNUSED))
                                 .and(couponPolicy.minOrderAmount.loe(orderAmount)) // orderAmount >= minOrderAmount 조건 추가
                                 .and(
                                         couponType.instanceOf(CategoryCoupon.class)
@@ -61,7 +61,7 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
                                                 )
                                 )
                 )
-                .orderBy(coupon.issueDate.asc());
+                .orderBy(userCoupon.issueDate.asc());
 
         return query.fetch();
     }
@@ -76,13 +76,13 @@ public class CustomCouponRepositoryImpl implements CustomCouponRepository {
      * @return 사용되지 않은 쿠폰
      */
     @Override
-    public Optional<Coupon> findUnusedCouponByUserAndType(Long userId, Long couponTypeId) {
-        QCoupon coupon = QCoupon.coupon;
-        return Optional.ofNullable(jpaQueryFactory.selectFrom(coupon)
+    public Optional<UserCoupon> findUnusedCouponByUserAndType(Long userId, Long couponTypeId) {
+        QUserCoupon userCoupon = QUserCoupon.userCoupon;
+        return Optional.ofNullable(jpaQueryFactory.selectFrom(userCoupon)
                 .where(
-                        coupon.user.id.eq(userId),
-                        coupon.couponType.id.eq(couponTypeId),
-                        coupon.couponStatus.eq(CouponStatus.UNUSED)
+                        userCoupon.user.id.eq(userId),
+                        userCoupon.couponType.id.eq(couponTypeId),
+                        userCoupon.userCouponStatus.eq(UserCouponStatus.UNUSED)
                 ).fetchOne());
     }
 }

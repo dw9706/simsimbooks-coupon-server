@@ -2,18 +2,18 @@ package org.simsimbooks.couponserver.coupons.couponpolicy.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import org.simsimbooks.couponserver.coupons.couponpolicy.entity.DisCountType;
+import org.simsimbooks.couponserver.coupons.couponpolicy.entity.DiscountType;
 
 import java.math.BigDecimal;
 
 @Data
 @Builder
 public class CouponPolicyResponseDto {
-    private Long couponPolicyId;
+    private Long id;
 
-    private String couponPolicyName;
+    private String name;
 
-    private DisCountType discountType; // RATE, FIX
+    private DiscountType discountType; // RATE, FIX
 
     private BigDecimal discountRate;
 

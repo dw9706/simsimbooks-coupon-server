@@ -8,8 +8,8 @@ import org.simsimbooks.couponserver.coupons.couponpolicy.entity.CouponPolicy;
 public class CouponPolicyMapper {
     public static CouponPolicyResponseDto toResponse(CouponPolicy couponPolicy) {
         return CouponPolicyResponseDto.builder()
-                .couponPolicyId(couponPolicy.getId())
-                .couponPolicyName(couponPolicy.getName())
+                .id(couponPolicy.getId())
+                .name(couponPolicy.getName())
                 .discountType(couponPolicy.getDiscountType())
                 .discountRate(couponPolicy.getDiscountRate())
                 .discountPrice(couponPolicy.getDiscountPrice())

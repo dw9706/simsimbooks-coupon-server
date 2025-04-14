@@ -7,14 +7,14 @@ import org.simsimbooks.couponserver.category.CategoryRepository;
 import org.simsimbooks.couponserver.category.entity.Category;
 import org.simsimbooks.couponserver.coupons.bookcoupon.entity.BookCoupon;
 import org.simsimbooks.couponserver.coupons.categorycoupon.entity.CategoryCoupon;
-import org.simsimbooks.couponserver.coupons.coupon.CouponRepository;
-import org.simsimbooks.couponserver.coupons.coupon.entity.Coupon;
+import org.simsimbooks.couponserver.coupons.usercoupon.UserCouponRepository;
 import org.simsimbooks.couponserver.coupons.couponpolicy.CouponPolicyRepository;
 import org.simsimbooks.couponserver.coupons.couponpolicy.entity.CouponPolicy;
 import org.simsimbooks.couponserver.coupons.coupontype.dto.CouponTypeRequestDto;
 import org.simsimbooks.couponserver.coupons.coupontype.dto.CouponTypeResponseDto;
 import org.simsimbooks.couponserver.coupons.coupontype.entity.CouponType;
 import org.simsimbooks.couponserver.coupons.coupontype.mapper.CouponTypeMapper;
+import org.simsimbooks.couponserver.coupons.usercoupon.entity.UserCoupon;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ import java.util.Objects;
 @Transactional(readOnly = true)
 public class CouponTypeService{
     private final CouponTypeRepository couponTypeRepository;
-    private final CouponRepository couponRepository;
+    private final UserCouponRepository couponRepository;
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
     private final CouponPolicyRepository couponPolicyRepository;
@@ -110,7 +110,7 @@ public class CouponTypeService{
     public void deleteCouponType(Long couponTypeId) {
         validateId(couponTypeId);
         CouponType couponType = couponTypeRepository.findById(couponTypeId).orElseThrow(() -> new NoSuchElementException("쿠폰타입(id:" + couponTypeId + ")이 존재하지 않습니다."));
-        List<Coupon> coupons = couponRepository.findByCouponTypeId(couponTypeId);
+        List<UserCoupon> coupons = couponRepository.findByCouponTypeId(couponTypeId);
         if (!coupons.isEmpty()) {
             throw new IllegalStateException("쿠폰 타입(id:" + couponTypeId + ")이 이미 회원에게 발급되었습니다.");
         }

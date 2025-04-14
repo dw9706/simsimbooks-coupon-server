@@ -1,19 +1,19 @@
-package org.simsimbooks.couponserver.coupons.coupon.dto;
+package org.simsimbooks.couponserver.coupons.usercoupon.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.simsimbooks.couponserver.coupons.couponpolicy.entity.DisCountType;
+import org.simsimbooks.couponserver.coupons.couponpolicy.entity.DiscountType;
 
 import java.math.BigDecimal;
 
 @Getter
 @Setter
 @SuperBuilder
-public class FixCouponResponseDto extends CouponResponseDto{
+public class FixUserCouponResponseDto extends UserCouponResponseDto {
 
     // 할인 형태
-    private final DisCountType disCountType = DisCountType.FIX;
+    private final DiscountType discountType = DiscountType.FIX;
     // 할인액
     private BigDecimal discountPrice;
     // 최소 주문 금액

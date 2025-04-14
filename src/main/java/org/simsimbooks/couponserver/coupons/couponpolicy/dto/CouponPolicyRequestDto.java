@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
-import org.simsimbooks.couponserver.coupons.couponpolicy.entity.DisCountType;
+import org.simsimbooks.couponserver.coupons.couponpolicy.entity.DiscountType;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -19,7 +19,7 @@ public class CouponPolicyRequestDto {
     private String couponPolicyName;
 
     @NotNull(message = "할인 형태는 필수 입력값입니다.")
-    private DisCountType discountType;
+    private DiscountType discountType;
 
     private BigDecimal discountPrice;
 
@@ -40,7 +40,7 @@ public class CouponPolicyRequestDto {
      */
     @AssertTrue(message = "FIX와 RATE 간에 상호배제되는 값을 확인하세요")
     public boolean isDiscountValueValid() {
-        if (discountType == DisCountType.RATE) {
+        if (discountType == DiscountType.RATE) {
             // null체크
             if (Objects.isNull(discountRate) || Objects.isNull(maxDiscountAmount)) {
                 return false;
@@ -53,7 +53,7 @@ public class CouponPolicyRequestDto {
             if (discountRate.signum() <= 0 || maxDiscountAmount.signum() <= 0) {
                 return false;
             }
-        } else if (discountType == DisCountType.FIX) {
+        } else if (discountType == DiscountType.FIX) {
             if (Objects.isNull(discountPrice)) {
                 return false;
             }

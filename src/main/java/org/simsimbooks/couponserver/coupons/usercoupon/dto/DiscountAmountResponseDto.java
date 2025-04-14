@@ -1,4 +1,4 @@
-package org.simsimbooks.couponserver.coupons.coupon.dto;
+package org.simsimbooks.couponserver.coupons.usercoupon.dto;
 
 import lombok.Builder;
 import lombok.Getter;

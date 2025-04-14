@@ -5,18 +5,18 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.NoSuchElementException;
 
-public enum DisCountType {
+public enum DiscountType {
     RATE("정률"),
     FIX("정액");
 
     private final String name;
 
-    DisCountType(String name) {this.name = name;}
+    DiscountType(String name) {this.name = name;}
 
     // 역직렬화 : JSON -> Enum
     @JsonCreator
-    public static DisCountType from(String value) {
-        for (DisCountType disCountType : values()) {
+    public static DiscountType from(String value) {
+        for (DiscountType disCountType : values()) {
             if (disCountType.name.equals(value)) {
                 return disCountType;
             }

@@ -1,4 +1,4 @@
-package org.simsimbooks.couponserver.coupons.coupon.entity;
+package org.simsimbooks.couponserver.coupons.usercoupon.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,18 +8,18 @@ import org.simsimbooks.couponserver.user.entity.User;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "coupons")
+@Table(name = "user_coupons")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
 @Builder
-public class Coupon {
+public class UserCoupon {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "coupon_id")
-    private Long couponId;
+    @Column(name = "user_coupon_id")
+    private Long id;
 
     @Column(name = "issue_date", nullable = false)
     private LocalDateTime issueDate;
@@ -29,13 +29,13 @@ public class Coupon {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "coupon_status")
-    private CouponStatus couponStatus;
+    private UserCouponStatus userCouponStatus;
 
     @Column(name = "use_date")
     private LocalDateTime useDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "coupon_type_id", nullable = false)
+    @JoinColumn(name = "coupon_id", nullable = false)
     private CouponType couponType;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,11 +43,11 @@ public class Coupon {
     private User user;
 
     public void use() {
-        couponStatus = CouponStatus.USED;
+        userCouponStatus = UserCouponStatus.USED;
         useDate = LocalDateTime.now();
     }
 
     public void expire() {
-        couponStatus = CouponStatus.EXPIRED;
+        userCouponStatus = UserCouponStatus.EXPIRED;
     }
 }
