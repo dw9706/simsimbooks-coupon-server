@@ -16,3 +16,21 @@
 ## 심심북스 쿠폰 서버 ERD
 
 ![img.png](img.png)
+
+기존 심심북스 프로젝트의 쿠폰 관련 테이블명을 조금 변경했습니다.   
+### 변경 전   
+- couponTypes   
+    - 쿠폰을 적용하는 대상이 여러 유형으로 나뉜다는 점에서 couponType 이라고 지었습니다.
+- coupons
+  -  사용자가 실제로 사용하는 쿠폰 데이터를 담고 있으므로, user 엔티티가 coupon 엔티티를 참조하는 관점에서 테이블명을 coupons로 지정하였습니다.
+
+### 변경 후   
+- couponTypes --> coupons
+  - 쿠폰 정책과 관련하여 쿠폰에 대한 전반적인 정보를 함께 관리하므로, 이를 명확하게 표현하기 위해 테이블명을 coupons로 변경하였습니다.
+- coupons --> user_coupons
+  - 이 테이블은 쿠폰 자체의 정보보다는 사용자가 발급받은 쿠폰 데이터를 저장하며, 쿠폰 테이블과 회원 테이블을 연결하는 역할을 수행하기 때문에, 테이블명을 coupons에서 user_coupons로 변경하였습니다.      
+
+### 변경 이유 및 배경
+기존에는 couponPolicy와 couponType이라는 용어가 중복된 느낌을 주어 혼란스러웠습니다.   
+이를 개선하기 위해, 테이블명을 couponTypes에서 coupons로, coupons에서 user_coupons로 변경하였습니다.   
+변경 후 coupons 테이블은 쿠폰에 대한 전반적인 정보를, user_coupons 테이블은 사용자가 발급받은 쿠폰 정보를 담아 각각의 역할을 보다 명확하게 나타내고자 했습니다.
