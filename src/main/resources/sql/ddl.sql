@@ -10,15 +10,15 @@ CREATE TABLE IF NOT EXISTS coupon_policies (
     policy_description TEXT                                 -- 정책 상세 설명
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 2. 쿠폰종류 (coupon_types)
-CREATE TABLE IF NOT EXISTS coupon_types (
-    coupon_type_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    coupon_type_name VARCHAR(40) NOT NULL,                -- 쿠폰종류명
+-- 2. 쿠폰 (coupons)
+CREATE TABLE IF NOT EXISTS coupons (
+    coupon_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    coupon_name VARCHAR(40) NOT NULL,                -- 쿠폰명
     period INT NULL,                                      -- 기간 (예: 7, 30)
     deadline TIMESTAMP NULL,                              -- 마감일
     coupon_policy_id BIGINT NOT NULL,                     -- coupon_policies 테이블과 연결
     DTYPE VARCHAR(50) NOT NULL,                           -- 쿠폰 적용 대상 (예: AllCoupon, BookCoupon, CategoryCoupon 등)
-    CONSTRAINT fk_coupon_types_policy
+    CONSTRAINT fk_coupon_policy
     FOREIGN KEY (coupon_policy_id)
     REFERENCES coupon_policies(coupon_policy_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -31,19 +31,19 @@ CREATE TABLE IF NOT EXISTS users (
     gender VARCHAR(10) NOT NULL CHECK(gender IN ('MALE','FEMALE'))
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 4. 쿠폰 (coupons)
-CREATE TABLE IF NOT EXISTS coupons (
-   coupon_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+-- 4. 유저쿠폰 (user_coupons)
+CREATE TABLE IF NOT EXISTS user_coupons (
+    user_coupon_id BIGINT AUTO_INCREMENT PRIMARY KEY,
    issue_date TIMESTAMP NOT NULL,                       -- 발급일
    deadline TIMESTAMP NOT NULL,                         -- 마감일
    coupon_status VARCHAR(10) NOT NULL CHECK(coupon_status IN ('USED','EXPIRED','UNUSED')),
     use_date TIMESTAMP,                                  -- 사용일 (NULL 가능)
-    coupon_type_id BIGINT NOT NULL,                      -- coupon_types 테이블과 연결
+    coupon_id BIGINT NOT NULL,                      -- coupon_types 테이블과 연결
     user_id BIGINT NOT NULL,                             -- users 테이블과 연결
     CONSTRAINT fk_coupons_coupon_type
-    FOREIGN KEY (coupon_type_id)
-    REFERENCES coupon_types(coupon_type_id),
-    CONSTRAINT fk_coupons_user
+    FOREIGN KEY (coupon_id)
+    REFERENCES coupons(coupon_id),
+    CONSTRAINT fk_usercoupons_user
     FOREIGN KEY (user_id)
     REFERENCES users(user_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
