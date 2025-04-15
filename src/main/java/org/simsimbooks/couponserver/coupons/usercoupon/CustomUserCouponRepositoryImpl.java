@@ -14,7 +14,7 @@ import org.simsimbooks.couponserver.coupons.usercoupon.entity.QUserCoupon;
 import org.simsimbooks.couponserver.coupons.usercoupon.entity.UserCoupon;
 import org.simsimbooks.couponserver.coupons.usercoupon.entity.UserCouponStatus;
 import org.simsimbooks.couponserver.coupons.couponpolicy.entity.QCouponPolicy;
-import org.simsimbooks.couponserver.coupons.coupontype.entity.QCouponType;
+import org.simsimbooks.couponserver.coupons.coupon.entity.QCouponType;
 
 import java.math.BigDecimal;
 import java.util.List;

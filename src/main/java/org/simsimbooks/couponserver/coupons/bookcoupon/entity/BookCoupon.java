@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.simsimbooks.couponserver.book.entity.Book;
-import org.simsimbooks.couponserver.coupons.coupontype.entity.CouponType;
+import org.simsimbooks.couponserver.coupons.coupon.entity.Coupon;
 
 
 @Entity
@@ -15,7 +15,7 @@ import org.simsimbooks.couponserver.coupons.coupontype.entity.CouponType;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @DiscriminatorValue("BookCoupon")
-public class BookCoupon extends CouponType {
+public class BookCoupon extends Coupon {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")

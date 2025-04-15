@@ -6,12 +6,12 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.simsimbooks.couponserver.coupons.coupontype.entity.CouponType;
+import org.simsimbooks.couponserver.coupons.coupon.entity.Coupon;
 
 @Entity
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "all_coupons")
 @DiscriminatorValue("AllCoupon")
-public class AllCoupon extends CouponType {
+public class AllCoupon extends Coupon {
 }

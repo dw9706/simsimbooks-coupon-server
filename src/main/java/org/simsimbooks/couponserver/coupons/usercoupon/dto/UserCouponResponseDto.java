@@ -7,7 +7,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.simsimbooks.couponserver.coupons.couponpolicy.entity.DiscountType;
 import org.simsimbooks.couponserver.coupons.usercoupon.entity.UserCouponStatus;
-import org.simsimbooks.couponserver.coupons.coupontype.entity.CouponTargetType;
+import org.simsimbooks.couponserver.coupons.coupon.entity.CouponType;
 
 import java.time.LocalDateTime;
 @NoArgsConstructor
@@ -28,7 +28,7 @@ public abstract class UserCouponResponseDto {
     // 쿠폰 정책 이름
     private String couponTypeName;
     // 쿠폰 적용 대상 -> ALL, CATEGORY, BOOK
-    private CouponTargetType couponTargetType;
+    private CouponType couponType;
     // 쿠폰 적용 대상의 Id
     private Long couponTargetId; //추후 고민
 

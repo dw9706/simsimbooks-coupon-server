@@ -1,17 +1,17 @@
-package org.simsimbooks.couponserver.coupons.coupontype.dto;
+package org.simsimbooks.couponserver.coupons.coupon.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import org.simsimbooks.couponserver.coupons.coupontype.entity.CouponTargetType;
+import org.simsimbooks.couponserver.coupons.coupon.entity.CouponType;
 
 import java.time.LocalDateTime;
 
 @Builder
 @Data
-public class CouponTypeResponseDto {
-    private Long couponTypeId;
+public class CouponResponseDto {
+    private Long id;
 
-    private String couponTypeName;
+    private String name;
 
     private Integer period;
 
@@ -21,7 +21,7 @@ public class CouponTypeResponseDto {
 
     private Long couponPolicyId;
 
-    private CouponTargetType couponTypes; //ALL, CATEGORY, BOOK
+    private CouponType couponTypes; //ALL, CATEGORY, BOOK
 
     private Long couponTargetId;// 타겟의 Id
 

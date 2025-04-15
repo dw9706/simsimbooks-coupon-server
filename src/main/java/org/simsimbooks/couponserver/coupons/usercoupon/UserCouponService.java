@@ -6,6 +6,7 @@ import org.simsimbooks.couponserver.book.entity.Book;
 import org.simsimbooks.couponserver.category.entity.Category;
 import org.simsimbooks.couponserver.coupons.bookcoupon.entity.BookCoupon;
 import org.simsimbooks.couponserver.coupons.categorycoupon.entity.CategoryCoupon;
+import org.simsimbooks.couponserver.coupons.coupon.entity.Coupon;
 import org.simsimbooks.couponserver.coupons.couponpolicy.entity.DiscountType;
 import org.simsimbooks.couponserver.coupons.usercoupon.dto.UserCouponResponseDto;
 import org.simsimbooks.couponserver.coupons.usercoupon.dto.DiscountAmountResponseDto;
@@ -14,8 +15,7 @@ import org.simsimbooks.couponserver.coupons.usercoupon.entity.UserCoupon;
 import org.simsimbooks.couponserver.coupons.usercoupon.entity.UserCouponStatus;
 import org.simsimbooks.couponserver.coupons.usercoupon.mapper.UserCouponMapper;
 import org.simsimbooks.couponserver.coupons.couponpolicy.entity.CouponPolicy;
-import org.simsimbooks.couponserver.coupons.coupontype.CouponTypeRepository;
-import org.simsimbooks.couponserver.coupons.coupontype.entity.CouponType;
+import org.simsimbooks.couponserver.coupons.coupon.CouponTypeRepository;
 import org.simsimbooks.couponserver.user.UserRepository;
 import org.simsimbooks.couponserver.user.entity.User;
 import org.springframework.data.domain.Page;
@@ -164,7 +164,7 @@ public class UserCouponService {
                 userCoupon.expire();
                 continue;
             }
-            if (userCoupon.getCouponType() instanceof CategoryCoupon categoryCoupon) {
+            if (userCoupon.getCoupon() instanceof CategoryCoupon categoryCoupon) {
                 Long targetId = categoryCoupon.getCategory().getId();
                 for (Long categoryId : categoryIdList) {
                     //카테고리 쿠폰의 targetId와 일치하면 List에 저장
@@ -196,7 +196,7 @@ public class UserCouponService {
     public void issueUserCoupons(List<Long> userIds, Long couponTypeId) {
         List<Long> result = new ArrayList<>();
         validateId(couponTypeId);
-        CouponType couponType = couponTypeRepository.findById(couponTypeId).orElseThrow(() -> new NoSuchElementException("쿠폰 정책(id:" + couponTypeId + ")이 존재하지 않습니다.1"));
+        Coupon coupon = couponTypeRepository.findById(couponTypeId).orElseThrow(() -> new NoSuchElementException("쿠폰 정책(id:" + couponTypeId + ")이 존재하지 않습니다.1"));
 
         // 회원 존재 확인
         for (Long userId : userIds) {
@@ -210,9 +210,9 @@ public class UserCouponService {
 
             UserCoupon userCoupon = UserCoupon.builder()
                     .issueDate(LocalDateTime.now())
-                    .deadline(calUserCouponDeadline(couponType))
+                    .deadline(calUserCouponDeadline(coupon))
                     .userCouponStatus(UserCouponStatus.UNUSED)
-                    .couponType(couponType)
+                    .coupon(coupon)
                     .user(user)
                     .build();
 
@@ -313,11 +313,11 @@ public class UserCouponService {
         List<Category> bookCategoryList = new ArrayList<>();
 
         // 쿠폰 적용 가능한지 확인
-        if (userCoupon.getCouponType() instanceof BookCoupon bookCoupon) {
+        if (userCoupon.getCoupon() instanceof BookCoupon bookCoupon) {
             if (!bookCoupon.getBook().getId().equals(bookId)) {
                 throw new IllegalArgumentException("책 쿠폰(id:" + userCouponId + ")은 책(id:" + bookId + ")에 적용 불가능합니다.");
             }
-        } else if (userCoupon.getCouponType() instanceof CategoryCoupon categoryCoupon) {
+        } else if (userCoupon.getCoupon() instanceof CategoryCoupon categoryCoupon) {
             boolean flag = true;
 //            for (List<CategoryResponseDto> categoryResponseDtos : categoryList) {
 //                for (CategoryResponseDto categoryResponseDto : categoryResponseDtos) {
@@ -357,7 +357,7 @@ public class UserCouponService {
         BigDecimal bookOrderPrice = book.getSalePrice().multiply(new BigDecimal(quantity));
 
         // 쿠폰 정책
-        CouponPolicy couponPolicy = userCoupon.getCouponType().getCouponPolicy();
+        CouponPolicy couponPolicy = userCoupon.getCoupon().getCouponPolicy();
         // 최소 주문 금액에 못미치면
         if (couponPolicy.getMinOrderAmount().compareTo(bookOrderPrice) > 0) {
             throw new IllegalArgumentException("주문 금액(" + bookOrderPrice + ")이 쿠폰 최소 주문 금액(" + couponPolicy.getMinOrderAmount() + ")에 못미칩니다.");
@@ -410,14 +410,14 @@ public class UserCouponService {
 
     /**
      * 쿠폰의 마감일을 계산해 반환한다.
-     * @param couponType
+     * @param coupon
      * @return
      */
-    private LocalDateTime calUserCouponDeadline(CouponType couponType) {
-        if (Objects.nonNull(couponType.getDeadline())) {
-            return couponType.getDeadline();
+    private LocalDateTime calUserCouponDeadline(Coupon coupon) {
+        if (Objects.nonNull(coupon.getDeadline())) {
+            return coupon.getDeadline();
         } else {
-            return LocalDateTime.now().plusDays(couponType.getPeriod());
+            return LocalDateTime.now().plusDays(coupon.getPeriod());
         }
 
 

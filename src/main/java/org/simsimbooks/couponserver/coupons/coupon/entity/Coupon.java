@@ -1,4 +1,4 @@
-package org.simsimbooks.couponserver.coupons.coupontype.entity;
+package org.simsimbooks.couponserver.coupons.coupon.entity;
 
 
 import jakarta.persistence.*;
@@ -17,16 +17,14 @@ import java.time.LocalDateTime;
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "coupon_types")
-public class CouponType {
-    public static final Long WELCOME_COUPON_TYPE_ID = 1L;
-    public static final Long BIRTHDAY_COUPON_TYPE_ID = 2L;
+@Table(name = "coupons")
+public class Coupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "coupon_type_id")
+    @Column(name = "coupon_id")
     private Long id;
 
-    @Column(name = "coupon_type_name", length = 40, nullable = false)
+    @Column(name = "coupon_name", length = 40, nullable = false)
     private String name;
 
     @Column(name = "period")

@@ -5,8 +5,8 @@ import org.simsimbooks.couponserver.coupons.couponpolicy.dto.CouponPolicyRequest
 import org.simsimbooks.couponserver.coupons.couponpolicy.dto.CouponPolicyResponseDto;
 import org.simsimbooks.couponserver.coupons.couponpolicy.entity.CouponPolicy;
 import org.simsimbooks.couponserver.coupons.couponpolicy.mapper.CouponPolicyMapper;
-import org.simsimbooks.couponserver.coupons.coupontype.CouponTypeRepository;
-import org.simsimbooks.couponserver.coupons.coupontype.entity.CouponType;
+import org.simsimbooks.couponserver.coupons.coupon.CouponTypeRepository;
+import org.simsimbooks.couponserver.coupons.coupon.entity.Coupon;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -67,8 +67,8 @@ public class CouponPolicyService{
     public void deleteCouponPolicy(Long couponPolicyId) {
         validateId(couponPolicyId);
         CouponPolicy couponPolicy = couponPolicyRepository.findById(couponPolicyId).orElseThrow(() -> new NoSuchElementException("쿠폰정책(id:" + couponPolicyId + ")이 존재하지 않습니다."));
-        List<CouponType> couponTypes = couponTypeRepository.findByCouponPolicyId(couponPolicyId);
-        if (!couponTypes.isEmpty()) {
+        List<Coupon> coupons = couponTypeRepository.findByCouponPolicyId(couponPolicyId);
+        if (!coupons.isEmpty()) {
             throw new IllegalStateException("쿠폰정책(id:" + couponPolicyId + ")으로 쿠폰 타입이 생성되었습니다.");
         }
         couponPolicyRepository.delete(couponPolicy);

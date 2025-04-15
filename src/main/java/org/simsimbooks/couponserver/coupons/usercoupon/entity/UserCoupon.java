@@ -2,7 +2,7 @@ package org.simsimbooks.couponserver.coupons.usercoupon.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.simsimbooks.couponserver.coupons.coupontype.entity.CouponType;
+import org.simsimbooks.couponserver.coupons.coupon.entity.Coupon;
 import org.simsimbooks.couponserver.user.entity.User;
 
 import java.time.LocalDateTime;
@@ -36,7 +36,7 @@ public class UserCoupon {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "coupon_id", nullable = false)
-    private CouponType couponType;
+    private Coupon coupon;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

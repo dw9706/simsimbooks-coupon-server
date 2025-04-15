@@ -1,4 +1,4 @@
-package org.simsimbooks.couponserver.coupons.coupontype;
+package org.simsimbooks.couponserver.coupons.coupon;
 
 import lombok.RequiredArgsConstructor;
 import org.simsimbooks.couponserver.book.BookRepository;
@@ -7,13 +7,13 @@ import org.simsimbooks.couponserver.category.CategoryRepository;
 import org.simsimbooks.couponserver.category.entity.Category;
 import org.simsimbooks.couponserver.coupons.bookcoupon.entity.BookCoupon;
 import org.simsimbooks.couponserver.coupons.categorycoupon.entity.CategoryCoupon;
+import org.simsimbooks.couponserver.coupons.coupon.dto.CouponRequestDto;
+import org.simsimbooks.couponserver.coupons.coupon.dto.CouponResponseDto;
+import org.simsimbooks.couponserver.coupons.coupon.mapper.CouponMapper;
 import org.simsimbooks.couponserver.coupons.usercoupon.UserCouponRepository;
 import org.simsimbooks.couponserver.coupons.couponpolicy.CouponPolicyRepository;
 import org.simsimbooks.couponserver.coupons.couponpolicy.entity.CouponPolicy;
-import org.simsimbooks.couponserver.coupons.coupontype.dto.CouponTypeRequestDto;
-import org.simsimbooks.couponserver.coupons.coupontype.dto.CouponTypeResponseDto;
-import org.simsimbooks.couponserver.coupons.coupontype.entity.CouponType;
-import org.simsimbooks.couponserver.coupons.coupontype.mapper.CouponTypeMapper;
+import org.simsimbooks.couponserver.coupons.coupon.entity.Coupon;
 import org.simsimbooks.couponserver.coupons.usercoupon.entity.UserCoupon;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,9 +27,9 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class CouponTypeService{
-    private final CouponTypeRepository couponTypeRepository;
-    private final UserCouponRepository couponRepository;
+public class CouponService {
+    private final CouponRepository couponRepository;
+    private final UserCouponRepository userCouponRepository;
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
     private final CouponPolicyRepository couponPolicyRepository;
@@ -39,9 +39,9 @@ public class CouponTypeService{
      * @param pageable
      * @return 쿠폰타입 페이지
      */
-    public Page<CouponTypeResponseDto> getAllCouponType(Pageable pageable) {
-        Page<CouponType> couponTypes = couponTypeRepository.findAll(pageable);
-        return couponTypes.map(CouponTypeMapper::toResponse);
+    public Page<CouponResponseDto> getAllCouponType(Pageable pageable) {
+        Page<Coupon> couponTypes = couponRepository.findAll(pageable);
+        return couponTypes.map(CouponMapper::toResponse);
     }
 
     /**
@@ -51,10 +51,10 @@ public class CouponTypeService{
      * @throws IllegalArgumentException id가 0이거나 null일 경우
      * @return
      */
-    public CouponTypeResponseDto getCouponType(Long couponTypeId) {
+    public CouponResponseDto getCouponType(Long couponTypeId) {
         validateId(couponTypeId);
-        CouponType couponType = couponTypeRepository.findById(couponTypeId).orElseThrow(() -> new NoSuchElementException("쿠폰타입(id:" + couponTypeId + ")이 존재하지 않습니다."));
-        return CouponTypeMapper.toResponse(couponType);
+        Coupon coupon = couponRepository.findById(couponTypeId).orElseThrow(() -> new NoSuchElementException("쿠폰타입(id:" + couponTypeId + ")이 존재하지 않습니다."));
+        return CouponMapper.toResponse(coupon);
 
     }
 
@@ -65,10 +65,10 @@ public class CouponTypeService{
      * @param couponPolicyId
      * @return
      */
-    public Page<CouponTypeResponseDto> getCouponByCouponPolicy(Pageable pageable, Long couponPolicyId) {
+    public Page<CouponResponseDto> getCouponByCouponPolicy(Pageable pageable, Long couponPolicyId) {
         validateId(couponPolicyId);
-        Page<CouponType> couponTypePage = couponTypeRepository.findByCouponPolicyId(pageable, couponPolicyId);
-        return couponTypePage.map(CouponTypeMapper::toResponse);
+        Page<Coupon> couponTypePage = couponRepository.findByCouponPolicyId(pageable, couponPolicyId);
+        return couponTypePage.map(CouponMapper::toResponse);
     }
 
     /**
@@ -80,41 +80,41 @@ public class CouponTypeService{
      * @return 저장한 쿠폰 타입의 reponseDto
      */
     @Transactional
-    public CouponTypeResponseDto createCouponType(CouponTypeRequestDto requestDto) {
-        CouponType couponType = CouponTypeMapper.toCouponType(requestDto);
-        if (couponType instanceof BookCoupon) {
+    public CouponResponseDto createCouponType(CouponRequestDto requestDto) {
+        Coupon coupon = CouponMapper.toCouponType(requestDto);
+        if (coupon instanceof BookCoupon) {
             validateId(requestDto.getTargetId());
             Book book = bookRepository.findById(requestDto.getTargetId()).orElseThrow(() -> new NoSuchElementException("책(id:" + requestDto.getTargetId() + ")이 존재하지 않습니다."));
-            ((BookCoupon) couponType).setBook(book);
-        } else if (couponType instanceof CategoryCoupon) {
+            ((BookCoupon) coupon).setBook(book);
+        } else if (coupon instanceof CategoryCoupon) {
             validateId(requestDto.getTargetId());
             Category category = categoryRepository.findById(requestDto.getTargetId()).orElseThrow(() -> new NoSuchElementException("카테고리(id:" + requestDto.getTargetId() + ")이 존재하지 않습니다."));
-            ((CategoryCoupon) couponType).setCategory(category);
+            ((CategoryCoupon) coupon).setCategory(category);
         }
         validateId(requestDto.getCouponPolicyId());
         CouponPolicy couponPolicy = couponPolicyRepository.findById(requestDto.getCouponPolicyId()).orElseThrow(() -> new NoSuchElementException("쿠폰 정책(id:" + requestDto.getCouponPolicyId() + ")이 존재하지 않습니다."));
-        couponType.setCouponPolicy(couponPolicy);
-        CouponType save = couponTypeRepository.save(couponType);
-        return CouponTypeMapper.toResponse(save);
+        coupon.setCouponPolicy(couponPolicy);
+        Coupon save = couponRepository.save(coupon);
+        return CouponMapper.toResponse(save);
     }
 
     /**
      * 특정 쿠폰 타입을 삭제한다.
      * 쿠폰 타입이 회원들에게 발급되면 삭제할 수 없다.
-     * @param couponTypeId
+     * @param couponId
      * @throws IllegalArgumentException id가 0이거나 null일 경우
      * @throws NoSuchElementException 책,쿠폰타입이 존재하지 않을 경우
      * @throws IllegalStateException 쿠폰 타입이 이미 회원들에게 발급되었을 때
      */
     @Transactional
-    public void deleteCouponType(Long couponTypeId) {
-        validateId(couponTypeId);
-        CouponType couponType = couponTypeRepository.findById(couponTypeId).orElseThrow(() -> new NoSuchElementException("쿠폰타입(id:" + couponTypeId + ")이 존재하지 않습니다."));
-        List<UserCoupon> coupons = couponRepository.findByCouponTypeId(couponTypeId);
+    public void deleteCouponType(Long couponId) {
+        validateId(couponId);
+        Coupon coupon = couponRepository.findById(couponId).orElseThrow(() -> new NoSuchElementException("쿠폰타입(id:" + couponId + ")이 존재하지 않습니다."));
+        List<UserCoupon> coupons = userCouponRepository.findByCouponId(couponId);
         if (!coupons.isEmpty()) {
-            throw new IllegalStateException("쿠폰 타입(id:" + couponTypeId + ")이 이미 회원에게 발급되었습니다.");
+            throw new IllegalStateException("쿠폰 타입(id:" + couponId + ")이 이미 회원에게 발급되었습니다.");
         }
-        couponTypeRepository.delete(couponType);
+        couponRepository.delete(coupon);
     }
 
     /**
