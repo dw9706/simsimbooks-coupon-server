@@ -14,9 +14,9 @@ public class BookMapper {
     }
 
     public static Book toBook(BookRequestDto requestDto) {
-        return Book.builder()
-                .title(requestDto.getTitle())
-                .salePrice(requestDto.getSalePrice())
-                .build();
+        return Book.createBook(
+                requestDto.getTitle(),
+                requestDto.getSalePrice()
+        );
     }
 }
