@@ -39,18 +39,18 @@ public class BookService {
 
     @Transactional
     public BookResponseDto updateBook(Long bookId, BookRequestDto requestDto) {
-        if (Objects.isNull(bookId)) {
-            throw new IllegalArgumentException("bookId is null");
-        }
         Optional<Book> optionalBook = bookRepository.findById(bookId);
 
         if (optionalBook.isEmpty()) {
             throw new NoSuchElementException("id : " + bookId + "인 book이 없습니다.");
         }
 
+
         Book book = optionalBook.get();
-        Optional.ofNullable(requestDto.getTitle()).ifPresent(book::setTitle);
-        Optional.ofNullable(requestDto.getSalePrice()).ifPresent(book::setSalePrice);
+        book.updateBookInfo(
+                requestDto.getTitle(),
+                requestDto.getSalePrice()
+        );
 
         return BookMapper.toResponse(book);
     }
