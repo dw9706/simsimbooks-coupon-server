@@ -18,13 +18,12 @@ public class CategoryMapper {
             children.add(child.getId());
         }
 
-
-        return CategoryResponseDto.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .parent(Objects.isNull(category.getParent()) ? null : category.getParent().getId())
-                .children(children)
-                .build();
+        CategoryResponseDto response = new CategoryResponseDto();
+        response.setId(category.getId());
+        response.setName(category.getName());
+        response.setParent(Objects.isNull(category.getParent()) ? null : category.getParent().getId());
+        response.setChildren(children);
+        return response;
     }
 
     public static Category toCategory(CategoryRequestDto requestDto, Category parent) {
