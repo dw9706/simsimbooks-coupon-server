@@ -59,11 +59,11 @@ public class CategoryService {
         }
 
         Category category = optionalCategory.get();
-        Optional.ofNullable(requestDto.getName()).ifPresent(category::setName);
+        category.changeName(requestDto.getName());
 
         // 변경사항에 부모 카테고리 변경도 있으면 조회 후 변경
         if (Objects.nonNull(requestDto.getParent())) {
-            categoryRepository.findById(requestDto.getParent()).ifPresent(category::setParent);
+            categoryRepository.findById(requestDto.getParent()).ifPresent(category::changeParent);
         }
 
         return CategoryMapper.toResponse(category);

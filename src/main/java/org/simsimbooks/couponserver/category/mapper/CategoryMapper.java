@@ -28,11 +28,10 @@ public class CategoryMapper {
     }
 
     public static Category toCategory(CategoryRequestDto requestDto, Category parent) {
-
-        return Category.builder()
-                .name(requestDto.getName())
-                .parent(parent)
-                .build();
+        return Category.createCategory(
+                requestDto.getName(),
+                parent
+        );
     }
 
 

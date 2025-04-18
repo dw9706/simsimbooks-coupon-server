@@ -36,7 +36,7 @@ public class CouponMapper {
         return responseDto;
     }
 
-    public static Coupon toCouponType(CouponRequestDto requestDto) {
+    public static Coupon toCoupon(CouponRequestDto requestDto) {
         if (requestDto.getCouponType() == CouponType.BOOK) {
             BookCoupon bookCoupon = BookCoupon.builder()
                     .name(requestDto.getName())
