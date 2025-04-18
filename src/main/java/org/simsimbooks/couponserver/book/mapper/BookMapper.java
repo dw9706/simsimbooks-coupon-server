@@ -6,11 +6,11 @@ import org.simsimbooks.couponserver.book.entity.Book;
 
 public class BookMapper {
     public static BookResponseDto toResponse(Book book) {
-        return BookResponseDto.builder()
-                .id(book.getId())
-                .title(book.getTitle())
-                .salePrice(book.getSalePrice())
-                .build();
+        BookResponseDto responseDto = new BookResponseDto();
+        responseDto.setId(book.getId());
+        responseDto.setTitle(book.getTitle());
+        responseDto.setSalePrice(book.getSalePrice());
+        return responseDto;
     }
 
     public static Book toBook(BookRequestDto requestDto) {
